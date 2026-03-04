@@ -638,20 +638,18 @@ async function fetchPrices() {
     console.log('goldapi failed:', e.message);
   }
 
-  // Method 2 — fallback metalpriceapi
+  // Method 2 — gold-api.com (free, no key, CORS-enabled, INR supported)
   try {
-    const r = await fetch(
-      'https://api.metalpriceapi.com/v1/latest?api_key=demo&base=USD&currencies=XAU,XAG,INR',
-      { signal: AbortSignal.timeout(6000) }
-    );
-    if (r.ok) {
-      const d = await r.json();
-      const rates = d.rates || {};
-      const usdInr = rates.INR || 83;
-      const goldOz = 1 / (rates.XAU || 0.0005);
-      const silvOz = 1 / (rates.XAG || 0.04);
-      const g24 = (goldOz * usdInr) / 31.1035;
-      const sil = (silvOz * usdInr) / 31.1035;
+    const [gRes, sRes] = await Promise.all([
+      fetchWithTimeout('https://gold-api.com/price/XAU?currency=INR', {}, 6000),
+      fetchWithTimeout('https://gold-api.com/price/XAG?currency=INR', {}, 6000)
+    ]);
+
+    if (gRes.ok && sRes.ok) {
+      const g = await gRes.json();
+      const s = await sRes.json();
+      const g24 = (g.price || 0) / 31.1035;
+      const sil = (s.price || 0) / 31.1035;
 
       if (g24 > 1000) {
         PRICES.gold_24k = Math.round(g24);
@@ -660,7 +658,7 @@ async function fetchPrices() {
         PRICES.gold_14k = Math.round(g24 * 14/24);
         PRICES.silver   = Math.round(sil * 10) / 10;
 
-        document.getElementById('priceStatus').innerHTML = '🟡 Prices via backup source';
+        document.getElementById('priceStatus').innerHTML = '🟡 Live prices via backup source';
         renderPriceTable();
         updateNisab();
         calculate();
@@ -668,7 +666,7 @@ async function fetchPrices() {
       }
     }
   } catch(e) {
-    console.log('metalpriceapi failed:', e.message);
+    console.log('gold-api.com fallback failed:', e.message);
   }
 
   // Method 3 — use hardcoded approximate prices
