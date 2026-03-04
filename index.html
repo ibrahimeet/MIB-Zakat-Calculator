@@ -595,7 +595,7 @@ function fmtFull(n) {
 function val(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
 
 // ─── LIVE PRICE FETCH ────────────────────────────
-const GOLD_API_KEY = 'goldapi-8xgj1kmm9gyjj3-io'; // ← paste your goldapi.io key
+const GOLD_API_KEY = 'goldapi-1zke8smgrdbnvq-io'; // ← paste your goldapi.io key
 
 async function fetchPrices() {
   document.getElementById('priceStatus').textContent = 'Fetching live prices...';
@@ -604,11 +604,11 @@ async function fetchPrices() {
   try {
     const [gRes, sRes] = await Promise.all([
       fetch('https://www.goldapi.io/api/XAU/INR', {
-        headers: { 'x-access-token': 'goldapi-8xgj1kmm9gyjj3-io' },
+        headers: { 'x-access-token': 'goldapi-1zke8smgrdbnvq-io' },
         signal: AbortSignal.timeout(6000)
       }),
       fetch('https://www.goldapi.io/api/XAG/INR', {
-        headers: { 'x-access-token': 'goldapi-8xgj1kmm9gyjj3-io' },
+        headers: { 'x-access-token': 'goldapi-1zke8smgrdbnvq-io' },
         signal: AbortSignal.timeout(6000)
       })
     ]);
