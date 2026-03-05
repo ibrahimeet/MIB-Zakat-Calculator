@@ -251,6 +251,56 @@
     font-weight: 600; color: var(--gold); font-size: 0.95em;
   }
 
+  /* ── GUIDE PAGE STEPS ── */
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .step-num {
+    background: var(--gold);
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 0.9em;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-text {
+    font-size: 0.88em;
+    color: var(--silver);
+    line-height: 1.6;
+    padding-top: 3px;
+  }
+  .step-text strong { color: var(--text); }
+
+  /* ── INFO BOX ── */
+  .info-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    font-size: 0.85em;
+    color: var(--silver);
+    line-height: 1.7;
+  }
+  .info-box .title {
+    font-weight: 600;
+    color: var(--green);
+    margin-bottom: 8px;
+    font-size: 0.9em;
+  }
+
   /* ── INPUTS ── */
   .field { margin-bottom: 14px; }
   .field label {
@@ -520,22 +570,23 @@
 
 <!-- ── BOTTOM NAV ── -->
 <nav class="bottom-nav">
-  <button class="nav-item active" onclick="switchPage('calc')">
+  <!-- FIX 1: Guide now correctly calls switchPage('guide') and starts active -->
+  <button class="nav-item active" onclick="switchPage('guide', this)">
     <div class="icon">📖</div><div>Guide</div>
   </button>
-  <button class="nav-item active" onclick="switchPage('calc')">
+  <button class="nav-item" onclick="switchPage('calc', this)">
     <div class="icon">🧮</div><div>Calculate</div>
   </button>
-  <button class="nav-item" onclick="switchPage('prices')">
+  <button class="nav-item" onclick="switchPage('prices', this)">
     <div class="icon">💰</div><div>Prices</div>
   </button>
-  <button class="nav-item" onclick="switchPage('result')">
+  <button class="nav-item" onclick="switchPage('result', this)">
     <div class="icon">📊</div><div>Results</div>
   </button>
-  <button class="nav-item" onclick="switchPage('faq')">
+  <button class="nav-item" onclick="switchPage('faq', this)">
     <div class="icon">❓</div><div>FAQ</div>
   </button>
-  <button class="nav-item" onclick="switchPage('feedback')">
+  <button class="nav-item" onclick="switchPage('feedback', this)">
     <div class="icon">💬</div><div>Feedback</div>
   </button>
 </nav>
@@ -562,7 +613,10 @@
     <button class="pay-cancel" onclick="closePaymentPopup()">Cancel</button>
   </div>
 </div>
-<!-- ══ PAGE 1: GUIDE ══ -->
+
+<!-- ══════════════════════════════════════════════ -->
+<!--              📖 PAGE: GUIDE  (FIX 2: only this page starts active) -->
+<!-- ══════════════════════════════════════════════ -->
 <div class="page active" id="page-guide">
 
   <div class="card" style="margin-top:16px">
@@ -573,13 +627,16 @@
       and has been held for one complete <strong style="color:var(--gold)">lunar year (Hawl)</strong>.
     </p>
   </div>
+
   <div class="section-head">📐 How to Calculate</div>
+  <!-- FIX 3: .step, .step-num, .step-text now have CSS defined above -->
   <div class="step"><div class="step-num">1</div><div class="step-text">Add all your <strong>zakatable assets</strong> (cash, gold, silver, investments, business)</div></div>
   <div class="step"><div class="step-num">2</div><div class="step-text">Subtract <strong>short-term debts</strong> due within this lunar year</div></div>
   <div class="step"><div class="step-num">3</div><div class="step-text">Check if your net wealth <strong>meets the Nisab threshold</strong></div></div>
   <div class="step"><div class="step-num">4</div><div class="step-text">If yes, pay <strong>2.5%</strong> of your net zakatable wealth</div></div>
 
   <div class="section-head">✅ What to Include</div>
+  <!-- FIX 4: .info-box now has CSS defined above -->
   <div class="info-box">
     <div class="title">✅ Zakatable (Include)</div>
     Cash at home · Bank savings · Gold & silver · Stocks & MFs · Business inventory · Receivables · Rental income savings · Cryptocurrency
@@ -588,12 +645,18 @@
     <div class="title" style="color:var(--red)">❌ Not Zakatable (Exclude)</div>
     Primary home · Personal car · Household furniture · Personal clothing · Business machinery · Long-term locked pension
   </div>
+
+  <div style="margin: 20px 0;">
+    <button class="btn primary" style="width:100%; padding:16px; font-size:1em; border-radius:12px;" onclick="switchPage('calc', document.querySelectorAll('.nav-item')[1])">
+      🧮 Start Calculating →
+    </button>
+  </div>
 </div>
 
 <!-- ══════════════════════════════════════════════ -->
-<!--              📄 PAGE: CALCULATE                -->
+<!--              📄 PAGE: CALCULATE  (FIX 5: removed 'active' class) -->
 <!-- ══════════════════════════════════════════════ -->
-<div id="page-calc" class="page active">
+<div id="page-calc" class="page">
   <div class="section-head">💵 Cash & Bank Accounts</div>
   <div class="card">
     <div class="field"><label>Cash at Home</label><input type="number" id="cashHome" placeholder="0" oninput="calculate()"></div>
@@ -903,10 +966,7 @@ let isAdmin = false;
 
 // ─── GO TO RESULTS ────────────────────────────────
 function goToResults() {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-result').classList.add('active');
-  document.querySelectorAll('.nav-item')[2].classList.add('active');
+  switchPage('result', document.querySelectorAll('.nav-item')[3]);
   calculate();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -919,14 +979,19 @@ function closePaymentPopup() {
   document.getElementById('paymentPopup').style.display = 'none';
 }
 
-// ─── NAVIGATION ───────────────────────────────────
-function switchPage(pageId) {
+// ─── NAVIGATION (FIX 6: accepts navBtn element directly instead of using event) ───
+function switchPage(pageId, navBtn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + pageId).classList.add('active');
-  event.target.closest('.nav-item').classList.add('active');
+
+  // navBtn can be passed directly or fall back to event target
+  const btn = navBtn || (event && event.target && event.target.closest('.nav-item'));
+  if (btn) btn.classList.add('active');
+
   if (pageId === 'result') calculate();
   if (pageId === 'feedback') loadFeedback();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ─── SUPPORT INFO ─────────────────────────────────
@@ -936,10 +1001,6 @@ function showSupportInfo() {
 
 // ─── FETCH PRICES ────────────────────────────────
 const GOLD_API_KEY = 'goldapi-1zke8smgrdbnvq-io';
-
-function fetchWithTimeout(url, options, timeout) {
-  return fetch(url, { ...options, signal: AbortSignal.timeout(timeout) });
-}
 
 async function fetchPrices() {
   try {
@@ -958,7 +1019,7 @@ async function fetchPrices() {
         PRICES.gold18 = Math.round(g24 * 18/24);
         PRICES.gold14 = Math.round(g24 * 14/24);
         PRICES.silver = Math.round(sil * 10) / 10;
-        console.log('✅ Prices fetched via goldapi.io (Method 1)');
+        console.log('✅ Prices fetched via goldapi.io');
         renderPriceTable(); calculate(); return;
       }
     }
